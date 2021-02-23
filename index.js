@@ -232,7 +232,7 @@ RedisDown.destroy = function (location, options, callback) {
     }
     var sanitizedLocation = sanitizeLocation(location);
     var client = redisLib.createClient(options.port, options.host, options);
-    client.del(sanitizedLocation + ':h', sanitizedLocation + ':z', function (e) {
+    client.del(sanitizedLocation + ':z', function (e) {
         client.quit();
         callback(e);
     });
@@ -246,7 +246,7 @@ RedisDown.prototype.destroy = function (doClose, callback) {
         doClose = true;
     }
     var self = this;
-    this.db.del(this.location + ':h', this.location + ':z', function (e) {
+    this.db.del(this.location + ':z', function (e) {
         if (doClose) {
             self.close(callback);
         } else {
