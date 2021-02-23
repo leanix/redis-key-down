@@ -261,7 +261,7 @@ RedisDown.prototype.destroy = function (doClose, callback) {
  * when the identifier is identical, it is safe to reuse the same client.
  */
 function _makeRedisId(location, options) {
-    var redisIdOptions = ['host', 'port',
+    var redisIdOptions = ['host', 'port', 'tls', 'password',
         'parser', 'return_buffers', 'detect_buffers', 'socket_nodelay', 'no_ready_check',
         'enable_offline_queue', 'retry_max_delay', 'connect_timeout', 'max_attempts'
     ];
