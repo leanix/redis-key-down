@@ -138,7 +138,7 @@ RedisDown.prototype._put = function (key, rawvalue, opt, callback) {
     if (typeof rawvalue === 'undefined' || rawvalue === null) {
         rawvalue = '';
     }
-    this.__exec(this.__appendPutCmd([], key, rawvalue.toString()), callback);
+    this.__exec(this.__appendPutCmd([], key, cleanKey(rawvalue)), callback);
 };
 
 RedisDown.prototype._del = function (key, opt, cb) {
