@@ -315,7 +315,12 @@ function toBufferOrString(key) {
 }
 
 function valueKey(location, key) {
-    return location + '$' + key;
+    var prefix = location + '$';
+    if (Buffer.isBuffer(key)) {
+        return Buffer.concat([Buffer.from(prefix), key]);
+    } else {
+        return prefix + key;
+    }
 }
 
 RedisDown.reset = function (callback) {
