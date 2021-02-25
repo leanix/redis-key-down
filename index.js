@@ -110,8 +110,16 @@ RedisDown.prototype._open = function (options, callback) {
     }
 };
 
+RedisDown.prototype._serializeKey = function (key) {
+    return toBufferOrString(key);
+}
+
+RedisDown.prototype._serializeValue = function (value) {
+    return toBufferOrString(value);
+}
+
 RedisDown.prototype._get = function (key, options, callback) {
-    this.db.hget(this.location + ':h', cleanKey(key), function (e, v) {
+    this.db.get(valueKey(this.location, key), function (e, v) {
         if (e) {
             return setImmediate(function callNext() {
                 return callback(e);
@@ -134,11 +142,11 @@ RedisDown.prototype._get = function (key, options, callback) {
     });
 };
 
-RedisDown.prototype._put = function (key, rawvalue, opt, callback) {
-    if (typeof rawvalue === 'undefined' || rawvalue === null) {
-        rawvalue = '';
+RedisDown.prototype._put = function (key, value, opt, callback) {
+    if (typeof value === 'undefined' || value === null) {
+        value = '';
     }
-    this.__exec(this.__appendPutCmd([], key, rawvalue.toString()), callback);
+    this.__exec(this.__appendPutCmd([], key, value), callback);
 };
 
 RedisDown.prototype._del = function (key, opt, cb) {
@@ -166,16 +174,14 @@ RedisDown.prototype.__getPrefix = function (prefix) {
 
 RedisDown.prototype.__appendPutCmd = function (commandList, key, value, prefix) {
     var resolvedPrefix = this.__getPrefix(prefix);
-    key = cleanKey(key);
-    commandList.push(['hset', resolvedPrefix + ':h', key, value === undefined ? '' : value]);
+    commandList.push(['set', valueKey(resolvedPrefix, key), value === undefined ? '' : value]);
     commandList.push(['zadd', resolvedPrefix + ':z', 0, key]);
     return commandList;
 };
 
 RedisDown.prototype.__appendDelCmd = function (commandList, key, prefix) {
-    key = cleanKey(key);
     var resolvedPrefix = this.__getPrefix(prefix);
-    commandList.push(['hdel', resolvedPrefix + ':h', key]);
+    commandList.push(['del', valueKey(resolvedPrefix, key)]);
     commandList.push(['zrem', resolvedPrefix + ':z', key]);
     return commandList;
 };
@@ -232,7 +238,7 @@ RedisDown.destroy = function (location, options, callback) {
     }
     var sanitizedLocation = sanitizeLocation(location);
     var client = redisLib.createClient(options.port, options.host, options);
-    client.del(sanitizedLocation + ':h', sanitizedLocation + ':z', function (e) {
+    client.del(sanitizedLocation + ':z', function (e) {
         client.quit();
         callback(e);
     });
@@ -246,7 +252,7 @@ RedisDown.prototype.destroy = function (doClose, callback) {
         doClose = true;
     }
     var self = this;
-    this.db.del(this.location + ':h', this.location + ':z', function (e) {
+    this.db.del(this.location + ':z', function (e) {
         if (doClose) {
             self.close(callback);
         } else {
@@ -261,7 +267,7 @@ RedisDown.prototype.destroy = function (doClose, callback) {
  * when the identifier is identical, it is safe to reuse the same client.
  */
 function _makeRedisId(location, options) {
-    var redisIdOptions = ['host', 'port',
+    var redisIdOptions = ['host', 'port', 'tls', 'password',
         'parser', 'return_buffers', 'detect_buffers', 'socket_nodelay', 'no_ready_check',
         'enable_offline_queue', 'retry_max_delay', 'connect_timeout', 'max_attempts'
     ];
@@ -300,11 +306,20 @@ function sanitizeLocation(location) {
     return location;
 }
 
-function cleanKey(key) {
+function toBufferOrString(key) {
     if (Buffer.isBuffer(key)) {
         return key;
     } else {
         return key.toString();
+    }
+}
+
+function valueKey(location, key) {
+    var prefix = location + '$';
+    if (Buffer.isBuffer(key)) {
+        return Buffer.concat([Buffer.from(prefix), key]);
+    } else {
+        return prefix + key;
     }
 }
 

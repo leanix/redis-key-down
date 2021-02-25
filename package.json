@@ -1,10 +1,10 @@
 {
-  "name": "redisdown",
-  "description": "redis adapter for levelup",
-  "version": "0.1.13",
+  "name": "redis-key-down",
+  "description": "redis adapter for levelup that uses individual keys for values",
+  "version": "0.1.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hmalphettes/redisdown.git"
+    "url": "https://github.com/leanix/redis-key-down.git"
   },
   "main": "index.js",
   "scripts": {

@@ -9,7 +9,11 @@ local keys = redis.call('zrevrangebylex', KEYS[1]..':z', unpack(ARGV))
 if #keys == 0 then
   return keys
 end
-local values = redis.call('hmget',KEYS[1]..':h',unpack(keys))
+local prefixkeys = {}
+for i,v in ipairs(keys) do
+  prefixkeys[i] = KEYS[1]..'$'..v
+end
+local values = redis.call('mget', unpack(prefixkeys))
 local result = {}
 for i,v in ipairs(keys) do
   result[i*2-1] = v
