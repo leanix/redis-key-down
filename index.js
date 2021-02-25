@@ -110,6 +110,14 @@ RedisDown.prototype._open = function (options, callback) {
     }
 };
 
+RedisDown.prototype._serializeKey = function (key) {
+    return toBufferOrString(key);
+}
+
+RedisDown.prototype._serializeValue = function (value) {
+    return toBufferOrString(value);
+}
+
 RedisDown.prototype._get = function (key, options, callback) {
     this.db.get(valueKey(this.location, key), function (e, v) {
         if (e) {
@@ -134,11 +142,11 @@ RedisDown.prototype._get = function (key, options, callback) {
     });
 };
 
-RedisDown.prototype._put = function (key, rawvalue, opt, callback) {
-    if (typeof rawvalue === 'undefined' || rawvalue === null) {
-        rawvalue = '';
+RedisDown.prototype._put = function (key, value, opt, callback) {
+    if (typeof value === 'undefined' || value === null) {
+        value = '';
     }
-    this.__exec(this.__appendPutCmd([], key, toBufferOrString(rawvalue)), callback);
+    this.__exec(this.__appendPutCmd([], key, value), callback);
 };
 
 RedisDown.prototype._del = function (key, opt, cb) {
@@ -166,14 +174,12 @@ RedisDown.prototype.__getPrefix = function (prefix) {
 
 RedisDown.prototype.__appendPutCmd = function (commandList, key, value, prefix) {
     var resolvedPrefix = this.__getPrefix(prefix);
-    key = toBufferOrString(key);
     commandList.push(['set', valueKey(resolvedPrefix, key), value === undefined ? '' : value]);
     commandList.push(['zadd', resolvedPrefix + ':z', 0, key]);
     return commandList;
 };
 
 RedisDown.prototype.__appendDelCmd = function (commandList, key, prefix) {
-    key = toBufferOrString(key);
     var resolvedPrefix = this.__getPrefix(prefix);
     commandList.push(['del', valueKey(resolvedPrefix, key)]);
     commandList.push(['zrem', resolvedPrefix + ':z', key]);
