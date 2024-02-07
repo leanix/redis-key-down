@@ -1,3 +1,4 @@
+[![REUSE status](https://api.reuse.software/badge/github.com/leanix/redis-key-down)](https://api.reuse.software/info/github.com/leanix/redis-key-down)
 # redis-key-down
 
 Redis backend for [LevelUP](https://github.com/rvagg/node-levelup)
