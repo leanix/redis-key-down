@@ -1,0 +1,9 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: redis-key-down
+Upstream-Contact: SAP Open Source Program Office ospo@sap.com
+Source: https://github.com/leanix/redis-key-down
+
+Files: *
+Copyright: 2024 SAP SE or an SAP affiliate company and redis-key-down contributors.
+License: MIT
+
