@@ -22,7 +22,7 @@
   ],
   "dependencies": {
     "abstract-leveldown": "~6.2.1",
-    "immediate": "~3.2.3",
+    "immediate": "~3.3.0",
     "inherits": "latest",
     "redis": "~3.0.2",
     "safe-buffer": "^5.2.0",
